@@ -56,3 +56,7 @@ class BookingFormExcluded(ModelForm):
             'total': forms.HiddenInput(),
             'state': forms.HiddenInput(),
         }
+
+
+class RoomFilterForm(forms.Form):
+    name = forms.CharField(required=False, label="Nombre habitación")
