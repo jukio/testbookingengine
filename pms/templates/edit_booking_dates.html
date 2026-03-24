@@ -1,0 +1,20 @@
+{% extends "main.html"%}
+
+{% block content %}
+
+<h1>Editar fechas de la reserva</h1>
+
+<p>Reserva: {{ booking.code }}</p>
+<p>Habitación: {{ booking.room.name }}</p>
+
+{% if error %}
+<div class="alert alert-danger">{{ error }}</div>
+{% endif %}
+
+<form method="post">
+    {% csrf_token %}
+    {{ booking_form.as_p }}
+    <button type="submit" class="btn btn-primary">Guardar</button>
+</form>
+
+{% endblock content %}

@@ -172,6 +172,48 @@ class EditBookingView(View):
         if customer_form.is_valid():
             customer_form.save()
             return redirect("/")
+        
+class EditBookingDatesView(View):
+    def get(self, request, pk):
+        booking = Booking.objects.get(id=pk)
+        booking_form = BookingDatesForm(instance=booking)
+
+        context = {
+            'booking': booking,
+            'booking_form': booking_form
+        }
+        return render(request, "edit_booking_dates.html", context)
+
+    @method_decorator(ensure_csrf_cookie)
+    def post(self, request, pk):
+        booking = Booking.objects.get(id=pk)
+        booking_form = BookingDatesForm(request.POST, instance=booking)
+
+        if booking_form.is_valid():
+            checkin = booking_form.cleaned_data['checkin']
+            checkout = booking_form.cleaned_data['checkout']
+
+            overlap = (Booking.objects
+                       .filter(room=booking.room, state="NEW")
+                       .filter(checkin__lte=checkout, checkout__gte=checkin)
+                       .exclude(id=booking.id))
+
+            if overlap.exists():
+                context = {
+                    'booking': booking,
+                    'booking_form': booking_form,
+                    'error': 'No hay disponibilidad para las fechas seleccionadas'
+                }
+                return render(request, "edit_booking_dates.html", context)
+
+            booking_form.save()
+            return redirect("/")
+
+        context = {
+            'booking': booking,
+            'booking_form': booking_form
+        }
+        return render(request, "edit_booking_dates.html", context)
 
 
 class DashboardView(View):
